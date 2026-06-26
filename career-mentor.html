@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Career Mentor System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D1117;color:#E6EDF3;font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:#161B22}
+::-webkit-scrollbar-thumb{background:#30363D;border-radius:4px}
+.header{background:#161B22;border-bottom:1px solid #30363D;padding:13px 18px;display:flex;align-items:center;gap:12;position:sticky;top:0;z-index:100}
+.header-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#00C9A7,#4F8EF7);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.header-title{font-weight:700;font-size:14px;letter-spacing:-0.2px}
+.header-sub{font-size:11px;color:#8B949E}
+.header-pct{margin-left:auto;text-align:right;flex-shrink:0}
+.header-pct-num{font-size:18px;font-weight:800;color:#00C9A7}
+.tabs{background:#161B22;border-bottom:1px solid #30363D;display:flex;overflow-x:auto;padding:0 10px;position:sticky;top:58px;z-index:99}
+.tabs::-webkit-scrollbar{height:0}
+.tab-btn{padding:10px 12px;background:none;border:none;cursor:pointer;white-space:nowrap;font-size:11.5px;color:#8B949E;border-bottom:2px solid transparent;display:flex;align-items:center;gap:5px;flex-shrink:0;transition:all .15s;font-family:inherit}
+.tab-btn.active{color:#00C9A7;border-bottom:2px solid #00C9A7;font-weight:700}
+.content{max-width:860px;margin:0 auto;padding:18px 14px 80px}
+.page{display:none}
+.page.active{display:block}
+/* Cards */
+.card{background:#161B22;border:1px solid #30363D;border-radius:12px;padding:16px;margin-bottom:12px}
+.card-hi{background:#1C2333;border:1px solid #30363D;border-radius:12px;padding:16px;margin-bottom:12px}
+/* Gradient hero */
+.hero{background:linear-gradient(135deg,rgba(0,201,167,.1),rgba(79,142,247,.1));border:1px solid rgba(0,201,167,.25);border-radius:14px;padding:20px;margin-bottom:20px}
+.hero-label{font-size:10px;color:#00C9A7;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:7px}
+.hero-title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:10px}
+.hero-sub{font-size:12px;color:#8B949E;margin-bottom:14px}
+/* Progress bar */
+.bar-wrap{background:#1C2333;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width .4s}
+/* Grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Section label */
+.slabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#8B949E;margin-bottom:8px}
+/* Buttons */
+.btn{border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+.btn-teal{background:#00C9A7;color:#000}
+.btn-gold{background:#FFD24A;color:#000}
+.btn-outline{background:none;border:1px solid currentColor;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;border-radius:6px;font-family:inherit}
+/* Task card */
+.task-card{background:#161B22;border:1px solid #30363D;border-radius:12px;overflow:hidden;margin-bottom:8px;transition:border-color .15s}
+.task-card.done{background:rgba(0,201,167,.07)}
+.task-header{padding:13px 14px;display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid #30363D;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px;cursor:pointer;transition:all .15s}
+.task-text{font-size:13.5px;font-weight:500;line-height:1.4;margin-bottom:4px}
+.task-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.task-time{font-size:10px;font-weight:600}
+.task-kpi{font-size:10px;color:#484F58}
+.task-arrow{color:#8B949E;font-size:11px;flex-shrink:0;margin-top:3px}
+.task-guide{border-top:1px solid #30363D;padding:16px 14px;background:#1C2333;display:none}
+.task-guide.open{display:block}
+.guide-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.guide-why{font-size:12.5px;color:#8B949E;line-height:1.65;margin-bottom:14px}
+.guide-steps{margin-bottom:14px}
+.guide-step{display:flex;gap:10px;margin-bottom:8px}
+.step-num{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{font-size:12px;color:#8B949E;line-height:1.6}
+pre.template{background:#0D1117;border:1px solid #30363D;border-radius:8px;padding:12px;font-size:11px;color:#8B949E;white-space:pre-wrap;font-family:monospace;line-height:1.6;margin-bottom:12px;overflow-x:auto}
+.warn-box{background:rgba(255,92,92,.1);border:1px solid rgba(255,92,92,.2);border-radius:8px;padding:10px;margin-top:12px}
+.resource-link{display:block;font-size:12px;color:#4F8EF7;text-decoration:none;margin-bottom:4px}
+.resource-link:hover{text-decoration:underline}
+/* Metric input */
+.metric-input{background:#1C2333;border:1px solid #30363D;border-radius:6px;padding:5px 9px;color:#E6EDF3;font-size:19px;font-weight:800;width:100%;outline:none;margin-bottom:8px;font-family:inherit}
+/* Tag */
+.tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+/* Checklist item */
+.check-item{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 12px;cursor:pointer;margin-bottom:6px;border:1px solid #30363D;background:#161B22;transition:all .15s}
+.check-box{width:18px;height:18px;border-radius:5px;border:2px solid #30363D;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;transition:all .15s}
+.check-text{font-size:12.5px;line-height:1.5}
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:60vh}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;padding:4px 0}
+.chat-msg{max-width:85%;padding:11px 14px;font-size:13px;line-height:1.65;white-space:pre-wrap;border-radius:14px}
+.chat-msg.user{align-self:flex-end;border-radius:14px 14px 4px 14px}
+.chat-msg.bot{align-self:flex-start;border:1px solid #30363D;background:#161B22;border-radius:14px 14px 14px 4px}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{flex:1;background:#161B22;border:1px solid #30363D;border-radius:10px;padding:11px 14px;color:#E6EDF3;font-size:13px;outline:none;font-family:inherit;resize:none}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.quick-btn{padding:5px 10px;border-radius:16px;border:1px solid #30363D;background:#161B22;color:#8B949E;font-size:10px;cursor:pointer;font-family:inherit}
+/* Typing dots */
+.typing{display:flex;gap:5px;padding:10px 14px;background:#161B22;border-radius:12px;border:1px solid #30363D;width:fit-content;align-self:flex-start}
+.dot{width:6px;height:6px;border-radius:50%;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+/* Sub tabs */
+.sub-tabs{display:flex;gap:8px;margin-bottom:16px}
+.sub-tab{flex:1;padding:9px;border-radius:10px;border:1px solid #30363D;background:#161B22;color:#8B949E;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+/* Vocab grid */
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
+.vocab-item{background:#1C2333;border-radius:8px;padding:8px 10px}
+.vocab-de{font-size:12.5px;font-weight:700}
+.vocab-en{font-size:11px;color:#8B949E}
+/* Review textarea */
+.review-area{width:100%;background:#1C2333;border:1px solid #30363D;border-radius:8px;padding:9px 11px;color:#E6EDF3;font-size:12px;resize:vertical;outline:none;font-family:inherit;line-height:1.6}
+/* Links */
+a{color:#4F8EF7;text-decoration:none}
+a:hover{text-decoration:underline}
+/* Week header */
+.week-header{background:#161B22;border:1px solid #30363D;border-radius:14px;padding:20px;margin-bottom:18px}
+.week-title{font-size:18px;font-weight:800;margin-bottom:3px}
+.week-sub{font-size:12px;color:#8B949E;margin-bottom:10px}
+.week-overview{font-size:12px;color:#8B949E;line-height:1.65;margin-top:12px}
+/* Info card */
+.info-card{background:#161B22;border:1px solid #30363D;border-radius:12px;padding:14px}
+.info-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.info-text{font-size:12px;color:#8B949E;line-height:1.6}
+/* German lesson nav */
+.lesson-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px}
+.lesson-pill{flex-shrink:0;padding:6px 10px;border-radius:8px;border:1px solid #30363D;background:#161B22;color:#8B949E;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-icon">🎯</div>
+  <div>
+    <div class="header-title">Career Mentor System</div>
+    <div class="header-sub">Fast Income First · Freelance + Job Search</div>
+  </div>
+  <div class="header-pct">
+    <div style="font-size:9px;color:#8B949E">Progress</div>
+    <div class="header-pct-num" id="overall-pct">0%</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('dash',this)">⚡ Dashboard</button>
+  <button class="tab-btn" onclick="showTab('w1',this)">① Week 1</button>
+  <button class="tab-btn" onclick="showTab('w2',this)">② Week 2</button>
+  <button class="tab-btn" onclick="showTab('w3',this)">③ Week 3</button>
+  <button class="tab-btn" onclick="showTab('w4',this)">④ Week 4</button>
+  <button class="tab-btn" onclick="showTab('toolkit',this)">🧰 Toolkit</button>
+  <button class="tab-btn" onclick="showTab('outreach',this)">✉️ Outreach</button>
+  <button class="tab-btn" onclick="showTab('deutsch',this)">🇩🇪 Deutsch</button>
+  <button class="tab-btn" onclick="showTab('coach',this)">🤖 AI Coach</button>
+  <button class="tab-btn" onclick="showTab('review',this)">✅ Review</button>
+</div>
+
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="page-dash" class="page active">
+  <div class="hero">
+    <div class="hero-label">Most Important Thing Today</div>
+    <div class="hero-title">Create your Upwork profile and send your first proposals — income is the priority, not perfection.</div>
+    <div class="hero-sub">Every day without a live profile is a day with zero chance of getting paid. Job applications run in the background — this is the main event.</div>
+    <button class="btn btn-teal" onclick="showTab('w1',document.querySelectorAll('.tab-btn')[1])">Go to Week 1 →</button>
+  </div>
+  <div class="slabel">4-Week Progress</div>
+  <div class="grid2" id="week-progress-grid" style="margin-bottom:20px"></div>
+  <div class="slabel">Key Metrics</div>
+  <div class="grid2" id="metrics-grid"></div>
+</div>
+
+<!-- WEEK 1 -->
+<div id="page-w1" class="page">
+  <div class="week-header" id="wh1">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div><div class="week-title">Week 1: Get Sellable & Launch Profiles</div><div id="w1-sub" class="week-sub">0/6 tasks</div></div>
+      <div id="w1-pct" style="font-size:26px;font-weight:800;color:#00C9A7">0%</div>
+    </div>
+    <div class="bar-wrap" style="height:7px"><div id="w1-bar" class="bar-fill" style="height:7px;width:0%;background:#00C9A7"></div></div>
+    <div class="week-overview">Income is the priority. This week you get Upwork + Fiverr live, build one portfolio sample, and send your first proposals. Don't perfect anything — launch fast. Job applications are a light background task only.</div>
+  </div>
+  <div class="slabel">Tasks — tap any task to open the full guide</div>
+  <div id="tasks-w1"></div>
+  <div class="grid2" style="margin-top:4px">
+    <div class="info-card"><div class="info-label" style="color:#00C9A7">🎯 Milestone</div><div class="info-text">Upwork + Fiverr live. 1 portfolio sample. 15 proposals sent. 3 job applications.</div></div>
+    <div class="info-card"><div class="info-label" style="color:#4F8EF7">📊 Outcome</div><div class="info-text">You exist as a sellable freelancer with real proposals in front of real clients. Income is now possible within days.</div></div>
+  </div>
+</div>
+
+<!-- WEEK 2 -->
+<div id="page-w2" class="page">
+  <div class="week-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div><div class="week-title">Week 2: Volume, First Response, Close a Client</div><div id="w2-sub" class="week-sub">0/6 tasks</div></div>
+      <div id="w2-pct" style="font-size:26px;font-weight:800;color:#4F8EF7">0%</div>
+    </div>
+    <div class="bar-wrap" style="height:7px"><div id="w2-bar" class="bar-fill" style="height:7px;width:0%;background:#4F8EF7"></div></div>
+    <div class="week-overview">Volume and conversion this week. Most income traces back to proposals sent in weeks 1-2. Keep the pipeline full, respond fast, and close your first paid project.</div>
+  </div>
+  <div class="slabel">Tasks — tap any task to open the full guide</div>
+  <div id="tasks-w2"></div>
+  <div class="grid2" style="margin-top:4px">
+    <div class="info-card"><div class="info-label" style="color:#4F8EF7">🎯 Milestone</div><div class="info-text">30-35 proposals sent. First paid project delivered. First review requested. 8 job applications.</div></div>
+    <div class="info-card"><div class="info-label" style="color:#4F8EF7">📊 Outcome</div><div class="info-text">Real income and a real review — the freelance engine is proven to work for you.</div></div>
+  </div>
+</div>
+
+<!-- WEEK 3 -->
+<div id="page-w3" class="page">
+  <div class="week-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div><div class="week-title">Week 3: Repeat Business + Fix Job Materials</div><div id="w3-sub" class="week-sub">0/4 tasks</div></div>
+      <div id="w3-pct" style="font-size:26px;font-weight:800;color:#F0A500">0%</div>
+    </div>
+    <div class="bar-wrap" style="height:7px"><div id="w3-bar" class="bar-fill" style="height:7px;width:0%;background:#F0A500"></div></div>
+    <div class="week-overview">With a first review in hand, focus on repeat/referral, raise your rate slightly, and invest real time in CV/LinkedIn/portfolio — now backed by genuine freelance proof.</div>
+  </div>
+  <div class="slabel">Tasks — tap any task to open the full guide</div>
+  <div id="tasks-w3"></div>
+  <div class="grid2" style="margin-top:4px">
+    <div class="info-card"><div class="info-label" style="color:#F0A500">🎯 Milestone</div><div class="info-text">Repeat/referral requested. Rate raised. CV + LinkedIn rebuilt. 16 total job applications.</div></div>
+    <div class="info-card"><div class="info-label" style="color:#4F8EF7">📊 Outcome</div><div class="info-text">Freelance income repeating + job materials now backed by real, provable delivered work.</div></div>
+  </div>
+</div>
+
+<!-- WEEK 4 -->
+<div id="page-w4" class="page">
+  <div class="week-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div><div class="week-title">Week 4: Scale Both Tracks</div><div id="w4-sub" class="week-sub">0/5 tasks</div></div>
+      <div id="w4-pct" style="font-size:26px;font-weight:800;color:#A78BFA">0%</div>
+    </div>
+    <div class="bar-wrap" style="height:7px"><div id="w4-bar" class="bar-fill" style="height:7px;width:0%;background:#A78BFA"></div></div>
+    <div class="week-overview">Both tracks now have momentum. Grow the freelance side and get serious about interview prep — job responses may be coming in.</div>
+  </div>
+  <div class="slabel">Tasks — tap any task to open the full guide</div>
+  <div id="tasks-w4"></div>
+  <div class="grid2" style="margin-top:4px">
+    <div class="info-card"><div class="info-label" style="color:#A78BFA">🎯 Milestone</div><div class="info-text">Consistent freelance pipeline. Airflow project live. 10 outreach messages. Interview-ready on SQL + project explanations.</div></div>
+    <div class="info-card"><div class="info-label" style="color:#4F8EF7">📊 Outcome</div><div class="info-text">Real income flowing from freelancing AND a competitive job search running in parallel — both tracks reinforcing each other.</div></div>
+  </div>
+</div>
+
+<!-- TOOLKIT -->
+<div id="page-toolkit" class="page">
+  <div class="card" style="border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.05);margin-bottom:16px">
+    <div style="font-size:11px;color:#F0A500;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Job-Ready Toolkit</div>
+    <div style="font-size:12px;color:#8B949E;line-height:1.6">Fix these 3 things and your applications become meaningfully more competitive. Use this alongside Week 3's materials task.</div>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab" id="st-cv" onclick="showToolkit('cv')" style="border-color:#00C9A7;color:#00C9A7;background:rgba(0,201,167,.1)">📄 CV</button>
+    <button class="sub-tab" id="st-li" onclick="showToolkit('li')">💼 LinkedIn</button>
+    <button class="sub-tab" id="st-port" onclick="showToolkit('port')">🗂 Portfolio</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div class="slabel" style="margin-bottom:0" id="toolkit-label">CV Checklist</div>
+    <span id="toolkit-count" style="font-size:12px;font-weight:700;color:#00C9A7">0/10</span>
+  </div>
+  <div class="bar-wrap" style="height:6px;margin-bottom:12px"><div id="toolkit-bar" class="bar-fill" style="height:6px;width:0%;background:#00C9A7"></div></div>
+  <div id="toolkit-items"></div>
+</div>
+
+<!-- OUTREACH -->
+<div id="page-outreach" class="page">
+  <div class="sub-tabs">
+    <button class="sub-tab" id="ot-guide" onclick="showOutreach('guide')" style="border-color:#00C9A7;color:#00C9A7;background:rgba(0,201,167,.1)">How to Write</button>
+    <button class="sub-tab" id="ot-tmpl" onclick="showOutreach('tmpl')">Templates</button>
+  </div>
+  <div id="outreach-guide">
+    <div class="slabel">The 5-Part Structure</div>
+    <div class="card" style="margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:#00C9A7;margin-bottom:4px">1. Specific Opener</div><div style="font-size:12px;color:#8B949E;line-height:1.6">Never start with "Hope this finds you well." Reference something REAL: a post they shared, a project on their GitHub. Specific = credible.</div></div>
+    <div class="card" style="margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:#00C9A7;margin-bottom:4px">2. One-line Identity</div><div style="font-size:12px;color:#8B949E;line-height:1.6">Who you are in one line relevant to THEM. "I'm a Junior Data Engineer who recently built an Airflow pipeline for..." Not your whole CV.</div></div>
+    <div class="card" style="margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:#00C9A7;margin-bottom:4px">3. One Proof Point</div><div style="font-size:12px;color:#8B949E;line-height:1.6">One specific, relevant fact. A project, a result, a tool. Pick the most relevant one for THIS person — not a list.</div></div>
+    <div class="card" style="margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:#00C9A7;margin-bottom:4px">4. Low-Friction Ask</div><div style="font-size:12px;color:#8B949E;line-height:1.6">Never ask for a job in message one. Ask for a 15-min chat, feedback, advice. These get yes far more often.</div></div>
+    <div class="card" style="margin-bottom:16px"><div style="font-size:13px;font-weight:700;color:#00C9A7;margin-bottom:4px">5. Easy Exit</div><div style="font-size:12px;color:#8B949E;line-height:1.6">"No pressure at all" or "Totally understand if you're busy" makes the ask feel safe to say yes to.</div></div>
+    <div class="warn-box" style="margin-top:0">
+      <div style="font-size:11px;color:#FF5C5C;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⚠ Common Mistakes</div>
+      <ul style="padding-left:16px;color:#8B949E;font-size:12px;line-height:1.9">
+        <li>Sending the exact same message to 50 people</li>
+        <li>Opening with generic flattery instead of something real</li>
+        <li>Writing more than 100 words</li>
+        <li>Asking for a job in the very first message</li>
+        <li>Following up more than once without a new reason</li>
+        <li>Messaging only senior leaders instead of ICs and recruiters</li>
+      </ul>
+    </div>
+  </div>
+  <div id="outreach-tmpl" style="display:none">
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Cold LinkedIn Outreach</div>
+      <pre class="template">Hi [Name], I saw your post about [specific thing] — really resonated with [reason].
+
+I'm a Junior Data Engineer who recently built [specific project] using [tool]. I'm exploring opportunities at [Company] and would love to hear about your experience on the data team, if you have 10-15 minutes.
+
+No pressure at all — happy to work around your schedule.</pre>
+      <div style="font-size:11px;color:#484F58">· Reference something real and specific — never generic · Under 80 words · Ask for a conversation, not a job</div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Application Follow-Up (after 7 days)</div>
+      <pre class="template">Hi [Name], I applied for the [Role] on [Date] and wanted to follow up. I'm still very interested — I built [specific project] which I think aligns well with what your team works on.
+
+Happy to share more or jump on a quick call. Thanks either way.</pre>
+      <div style="font-size:11px;color:#484F58">· Follow up once only · Reference your specific fit · Keep it short</div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Informational Interview Request</div>
+      <pre class="template">Hi [Name], I've been following your work in data engineering and would love to learn from your experience. Would you be open to a 15-minute chat about your path into the field?
+
+I'm happy to work around your schedule. Totally understand if you're too busy.</pre>
+      <div style="font-size:11px;color:#484F58">· Propose specific time windows · Don't ask for referral in first message · Always follow up with a thank-you</div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Thank-You After a Call</div>
+      <pre class="template">Hi [Name], thank you for the time today — I really enjoyed learning about [specific thing discussed]. It gave me a clearer picture of [specific takeaway].
+
+Thanks again, and I hope we stay in touch.</pre>
+      <div style="font-size:11px;color:#484F58">· Send within 24 hours · Mention one specific detail from the conversation · Brief — not another pitch</div>
+    </div>
+  </div>
+</div>
+
+<!-- DEUTSCH -->
+<div id="page-deutsch" class="page">
+  <div style="background:linear-gradient(135deg,rgba(255,92,92,.1),rgba(255,210,74,.12));border:1px solid rgba(255,210,74,.3);border-radius:12px;padding:14px;margin-bottom:16px">
+    <div style="font-size:11px;color:#FFD24A;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">🇩🇪 Deutsch — A1 to B1</div>
+    <div style="font-size:12px;color:#8B949E;line-height:1.6">45-60 min/day: structured lesson + live conversation practice. Consistency beats intensity.</div>
+    <div style="margin-top:8px;font-size:11px;color:#FFD24A;font-weight:700" id="german-progress-label">0/6 lessons completed</div>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab" id="dt-lessons" onclick="showDeutsch('lessons')" style="border-color:#FFD24A;color:#FFD24A;background:rgba(255,210,74,.1)">📖 Lessons</button>
+    <button class="sub-tab" id="dt-practice" onclick="showDeutsch('practice')">💬 Practice</button>
+    <button class="sub-tab" id="dt-phrases" onclick="showDeutsch('phrases')">⚡ Phrases</button>
+  </div>
+  <div id="deutsch-lessons">
+    <div class="lesson-pills" id="lesson-pills"></div>
+    <div id="lesson-content"></div>
+  </div>
+  <div id="deutsch-practice" style="display:none">
+    <div class="quick-btns">
+      <button class="quick-btn" onclick="setGermanInput('Wie geht\'s dir?')">Wie geht's dir?</button>
+      <button class="quick-btn" onclick="setGermanInput('Ich möchte Deutsch üben')">Ich möchte üben</button>
+      <button class="quick-btn" onclick="setGermanInput('Korrigiere meinen Satz: Ich bin lernen Deutsch')">Korrigiere mich</button>
+      <button class="quick-btn" onclick="setGermanInput('Lass uns über meinen Job sprechen')">Über meinen Job</button>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="german-msgs">
+        <div class="chat-msg bot">Hallo! Ich bin dein Deutsch-Übungspartner. 🇩🇪
+
+Wir üben zusammen — (I'll always add the English translation in brackets). I'll gently correct your mistakes and keep it at A1-B1 level.
+
+Wie geht's dir heute? (How are you today?)</div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="german-input" rows="1" placeholder="Schreib auf Deutsch oder Englisch..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGerman()}"></textarea>
+        <button class="btn btn-gold" onclick="sendGerman()">Send</button>
+      </div>
+    </div>
+  </div>
+  <div id="deutsch-phrases" style="display:none">
+    <div class="card" style="margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#FFD24A;margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Survival</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Ich verstehe nicht</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Können Sie das wiederholen?</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Sprechen Sie Englisch?</div>
+      <div style="font-size:13px;padding:6px 0">Langsamer, bitte</div>
+    </div>
+    <div class="card" style="margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#FFD24A;margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Job Context</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Ich suche eine Stelle als Data Engineer</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Ich habe Erfahrung mit Python und SQL</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Ist die Stelle remote möglich?</div>
+      <div style="font-size:13px;padding:6px 0">Wann kann ich anfangen?</div>
+    </div>
+    <div class="card"><div style="font-size:12px;font-weight:700;color:#FFD24A;margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Small Talk</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Wie war dein Wochenende?</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Das klingt interessant</div>
+      <div style="font-size:13px;padding:6px 0;border-bottom:1px solid #30363D">Ich stimme zu</div>
+      <div style="font-size:13px;padding:6px 0">Das ist eine gute Frage</div>
+    </div>
+  </div>
+</div>
+
+<!-- AI COACH -->
+<div id="page-coach" class="page">
+  <div class="quick-btns">
+    <button class="quick-btn" onclick="setCoachInput('Why am I getting zero responses?')">Zero responses?</button>
+    <button class="quick-btn" onclick="setCoachInput('Help me price this client project')">Help price project</button>
+    <button class="quick-btn" onclick="setCoachInput('Review this Upwork proposal: [paste it here]')">Review proposal</button>
+    <button class="quick-btn" onclick="setCoachInput('Write me a Fiverr gig description for data cleaning')">Fiverr gig desc</button>
+    <button class="quick-btn" onclick="setCoachInput('Mock interview: tell me about yourself')">Mock interview</button>
+  </div>
+  <div class="chat-wrap" style="height:65vh">
+    <div class="chat-msgs" id="coach-msgs">
+      <div class="chat-msg bot">I'm your AI Career Coach. Your plan: fast freelance income is the priority (Upwork/Fiverr — data cleaning, automation, pipelines), with job applications in the background, plus daily German.
+
+Ask me anything — proposal feedback, pricing, pitching a client, CV review, mock interviews.</div>
+    </div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="coach-input" rows="1" placeholder="Ask your coach anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCoach()}"></textarea>
+      <button class="btn btn-teal" onclick="sendCoach()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY REVIEW -->
+<div id="page-review" class="page">
+  <div class="card" style="border-color:rgba(0,201,167,.3);margin-bottom:16px">
+    <div style="font-size:11px;color:#00C9A7;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Weekly Review — Every Sunday</div>
+    <div style="font-size:12px;color:#8B949E;line-height:1.6">The highest-ROI 30 minutes of your week. Be honest — this is only for you.</div>
+  </div>
+  <div id="review-questions"></div>
+  <div id="review-done" style="display:none;background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.3);border-radius:12px;padding:14px;text-align:center;margin-top:12px">
+    <div style="font-size:20px;margin-bottom:4px">✅</div>
+    <div style="font-weight:700;color:#3FB950;margin-bottom:3px">Review Complete</div>
+    <div style="font-size:12px;color:#8B949E">Honest self-assessment is what separates people who course-correct from people who stay stuck.</div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<script>
+// ═══ STATE ═══════════════════════════════════════════════════════
+const state = {
+  tasks: {},
+  metrics: {},
+  checks: { cv:{}, li:{}, port:{} },
+  germanProgress: {},
+  reviewAnswers: {},
+  activeToolkit: 'cv',
+  activeDeutsch: 'lessons',
+  activeLesson: 0,
+};
+
+// ═══ DATA ════════════════════════════════════════════════════════
+const WEEKS_DATA = [
+  { id:'w1', color:'#00C9A7', tasks:[
+    { id:'w1t1', text:'Define your 3 sellable services from bootcamp skills', time:'1h', kpi:'3 services written down',
+      why:'Clients don\'t hire "data engineers" — they hire someone who solves one specific problem. Translate your skills into client language.',
+      steps:['List every tool you know: Python, SQL, Pandas, Airflow, Docker, Excel, any cloud platform.','Turn each into a client problem: "Python+Pandas" = "I clean and merge your messy CSV/Excel files." "SQL+ETL" = "I build a pipeline that pulls your data into one clean place automatically."','Write 1 sentence per service describing the PAIN it removes — not the tool.','Rank them by how fast you can deliver. Your fastest service = your lead offer on proposals.'],
+      tmpl:null, warn:'Don\'t list more than 3. A focused profile converts better than a generalist one.',
+      resources:[{l:'Upwork job feed — search to see what clients pay for',u:'https://upwork.com'}]},
+    { id:'w1t2', text:'Create Upwork profile — fast, not perfect', time:'2h', kpi:'Profile live today',
+      why:'Every day without a profile is a day with zero chance of income. Launch now, improve as you learn.',
+      steps:['Go to upwork.com → Create Account → Freelancer.','Title: "Data Pipeline & Automation Specialist | Python · SQL · Excel" — not just "Data Engineer".','Overview: open with the problem you solve, 3 bullet services, one credibility line, call to action.','Rate: $15-20/hr — intentionally low. You have zero reviews. This is your entry price only.','Skills: add Python, SQL, Pandas, Data Cleaning, ETL, Excel, Airflow.','Take the Upwork Excel and SQL skill tests if available — instant credibility.'],
+      tmpl:'UPWORK OVERVIEW:\n──────────────\nStruggling with messy data, manual reports, or repetitive Excel tasks?\n\nI help businesses:\n• Clean and merge messy CSV/Excel files using Python\n• Automate repetitive data tasks so you stop doing them by hand\n• Build simple pipelines that move your data to one clean place\n\nBackground: data engineering training (Python, SQL, Airflow) with real project experience.\n\nI respond fast and deliver on time. Send me your challenge — happy to look before you commit.',
+      warn:'Don\'t spend more than 2 hours. A live decent profile beats a perfect unpublished one.',
+      resources:[{l:'Upwork',u:'https://upwork.com'}]},
+    { id:'w1t3', text:'Create Fiverr profile + 3 gigs', time:'2h', kpi:'3 gigs live',
+      why:'Fiverr brings inbound clients passively once live — it works in the background while you focus on Upwork proposals.',
+      steps:['Go to fiverr.com → Join → Become a Seller.','Gig 1 — Data Cleaning: "I will clean and organize your messy Excel or CSV data" — Basic $15 / Standard $30 / Premium $60.','Gig 2 — Python Automation: "I will automate your repetitive Excel or data task with Python" — Basic $25 / Standard $50 / Premium $100.','Gig 3 — Data Pipeline: "I will build a simple automated data pipeline for your business" — Basic $40 / Standard $80 / Premium $150.','Make a gig image in Canva (free): dark background, white bold service title. 10 minutes each.'],
+      tmpl:null, warn:null,
+      resources:[{l:'Fiverr',u:'https://fiverr.com'},{l:'Canva (free gig images)',u:'https://canva.com'}]},
+    { id:'w1t4', text:'Build 1 portfolio sample — cap it at 3 hours', time:'3h', kpi:'PDF or GitHub link ready',
+      why:'You need one piece of proof before sending proposals. One solid simple sample beats nothing. Don\'t overbuild.',
+      steps:['Download a messy dataset from Kaggle (kaggle.com/datasets).','Clean it with Python/Pandas: remove duplicates, handle nulls, fix formatting, rename columns.','Add 2-3 simple charts and 3 bullet insights.','Export as a short PDF (3-4 pages) OR push to GitHub with a clear README.','This is your go-to link in every proposal this week.'],
+      tmpl:null, warn:'Hard cap: 3 hours. A second sample can come in Week 2. Don\'t delay your first proposals for a perfect sample.',
+      resources:[{l:'Kaggle Datasets (free)',u:'https://kaggle.com/datasets'}]},
+    { id:'w1t5', text:'Send first 15 Upwork proposals', time:'3h', kpi:'15 proposals sent',
+      why:'Proposals are the only thing that directly produces income. Everything else this week supports this — but THIS is what gets you paid.',
+      steps:['Search: "data cleaning", "excel automation", "python script", "csv data".','Filter: posted last 24 hours, fewer than 5 proposals = less competition.','10-15 min per proposal. Reference their specific problem. Attach your portfolio link. Ask one smart question.','Structure: acknowledge their problem → your proof → one clarifying question → call to action.'],
+      tmpl:'UPWORK PROPOSAL:\n──────────────\nHi [Name], I read your post — it sounds like [specific restatement of their problem].\n\nI recently handled something similar: [one-line reference to your portfolio, with link]. I can deliver [specific output] within [realistic timeframe].\n\nQuick question before we start: [one smart specific question about their data].\n\nHappy to share more examples — looking forward to hearing from you.',
+      warn:'Never copy-paste the same proposal to every job. Even small personalization doubles your response rate.',
+      resources:[]},
+    { id:'w1t6', text:'Light job search: update LinkedIn headline + apply to 3 jobs', time:'45min', kpi:'LinkedIn headline updated, 3 applications sent',
+      why:'Keep the job track alive at low effort — freelancing gets almost all your energy this week.',
+      steps:['LinkedIn headline only: "Data Engineer | Python · SQL · ETL | Open to Remote & Freelance" — full profile rebuild comes in Week 3.','Apply to 3 Junior Data Engineer / Data Analyst roles with your current CV as-is.','Track them in a simple spreadsheet: Company | Role | Date | Status.'],
+      tmpl:null, warn:'Don\'t let job applications eat your proposal time this week.',
+      resources:[{l:'LinkedIn Jobs',u:'https://linkedin.com/jobs'},{l:'We Work Remotely',u:'https://weworkremotely.com'}]},
+  ]},
+  { id:'w2', color:'#4F8EF7', tasks:[
+    { id:'w2t1', text:'Send 15-20 more Upwork proposals (30-35 total)', time:'3h over week', kpi:'30-35 total proposals',
+      why:'New account response rate is 5-15%. At 30+ proposals you should see real responses if your profile is solid.',
+      steps:['Check Upwork 2-3x/day for fresh postings — early proposals get seen first.','Track every proposal: Job | Date | Status | Notes.','If 20+ sent with zero views: your opening line needs a rewrite. Fix that first.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w2t2', text:'Promote Fiverr gigs for free — 3 posts', time:'1h', kpi:'3 posts made',
+      why:'Fiverr\'s algorithm favors gigs with early engagement. A little outside promotion in week 1-2 boosts visibility.',
+      steps:['Join 3 Facebook groups: "Excel help", "small business owners", "data analysis freelance".','Share your portfolio sample with a short non-spammy intro.','Post once on LinkedIn: what you do + your Fiverr link + one useful tip.'],
+      tmpl:null, warn:'One thoughtful post per group. Repeated posting gets you removed.', resources:[]},
+    { id:'w2t3', text:'Respond to every message within 1 hour', time:'Ongoing', kpi:'100% response rate',
+      why:'Speed of response is one of the strongest, most overlooked factors in winning freelance work.',
+      steps:['Turn on Upwork and Fiverr mobile notifications now.','Keep a short "Got your message, give me 30 min to review properly" reply ready.','Ask 1-2 clarifying questions before quoting — shows competence, avoids underpricing.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w2t4', text:'Close your first paid project', time:'Varies', kpi:'First contract signed',
+      why:'One closed project proves the system works for YOU. The review matters more than the money right now.',
+      steps:['Price to WIN, not to maximize: $20-50 is fine for project 1.','Set a generous deadline: promise 3 days, deliver in 2.','Send one update halfway through: "On track, delivering by Thursday."','Deliver with a 3-4 sentence explanation of what you did and why.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w2t5', text:'Ask for your first review directly', time:'5min', kpi:'Review requested after delivery',
+      why:'Reviews don\'t happen automatically. Most satisfied clients simply forget unless asked.',
+      steps:['"If you\'re happy with the work, a quick review would really help me build my profile — no pressure though.","One gentle follow-up after 3-4 days if no response. Then let it go.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w2t6', text:'Apply to 5 more jobs in background', time:'1h', kpi:'8 total applications',
+      why:'Keep the job pipeline alive without taking real time from freelancing.',
+      steps:['Apply with current CV as-is — no major rewrite yet.','Spend max 10 min per application this week.'],
+      tmpl:null, warn:null, resources:[{l:'Wellfound (startup jobs)',u:'https://wellfound.com'}]},
+  ]},
+  { id:'w3', color:'#F0A500', tasks:[
+    { id:'w3t1', text:'Ask first client for repeat work or a referral', time:'15min', kpi:'Repeat or referral requested',
+      why:'A happy client is your easiest next sale — far easier than finding a new one.',
+      steps:['"Glad it worked out! If anything else comes up — more data work, another report — I\'m here. And if you know anyone who could use this kind of work, I\'d really appreciate an intro."'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w3t2', text:'Raise rate to $20-25/hr and send 15 more proposals', time:'2h', kpi:'Rate raised, 15 proposals sent',
+      why:'With 1-2 reviews you\'re no longer a zero-proof account. You can charge more without losing as many leads.',
+      steps:['Update your Upwork rate to $20-25/hr.','Reference your real review in new proposals: "I\'ve delivered similar work — here\'s a recent review."','Continue same search: fresh postings, low competition.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w3t3', text:'Rebuild CV and LinkedIn fully (use Toolkit tab)', time:'4h', kpi:'CV and LinkedIn checklists 80%+ done',
+      why:'You now have real freelance work to add as genuine experience — much stronger than bootcamp projects alone.',
+      steps:['Open Toolkit tab → work through CV checklist fully.','Add your freelance project as real experience: "Delivered data cleaning project for a client, processing X rows, reducing manual work by Y hours/week."','Work through LinkedIn checklist: headline, About, Featured section with portfolio links.','Add your portfolio sample with a proper README to GitHub.'],
+      tmpl:null, warn:null,
+      resources:[{l:'rxresu.me (free CV builder)',u:'https://rxresu.me'},{l:'GitHub',u:'https://github.com'}]},
+    { id:'w3t4', text:'Apply to 8 jobs with upgraded materials', time:'1.5h', kpi:'8 applications with new CV',
+      why:'Stronger materials backed by real freelance proof make job applications meaningfully more competitive.',
+      steps:['Include your GitHub and portfolio link in every application directly.','Target: Junior Data Engineer, Data Engineer I, Associate Data Engineer, ETL Developer, Data Analyst.','Track in spreadsheet.'],
+      tmpl:null, warn:null,
+      resources:[{l:'LinkedIn Jobs',u:'https://linkedin.com/jobs'},{l:'Remote.co',u:'https://remote.co'}]},
+  ]},
+  { id:'w4', color:'#A78BFA', tasks:[
+    { id:'w4t1', text:'Keep sending 10+ proposals/week — make it a habit', time:'2h', kpi:'10+ proposals sent',
+      why:'Freelance income needs constant pipeline feeding. Even with repeat clients, new proposals prevent dry spells.',
+      steps:['10-15 proposals/week is your permanent ongoing habit from now on.','Use spare time between client work to keep the proposal engine running.'],
+      tmpl:null, warn:null, resources:[]},
+    { id:'w4t2', text:'Build second portfolio project with Airflow orchestration', time:'4h', kpi:'Airflow project on GitHub with README',
+      why:'Serves both tracks: stronger Upwork automation portfolio AND exactly what Data Engineer job postings require.',
+      steps:['Take your Week 1 sample or a new dataset.','Build a simple 3-task Airflow DAG: extract → transform → load.','Add architecture diagram + screenshot of successful DAG run to README.','Add this link to Upwork/Fiverr profiles AND your CV/LinkedIn.'],
+      tmpl:null, warn:null,
+      resources:[{l:'Airflow quickstart (official)',u:'https://airflow.apache.org/docs/apache-airflow/stable/start.html'}]},
+    { id:'w4t3', text:'Send 10 outreach messages on LinkedIn (see Outreach tab)', time:'2h', kpi:'10 outreach messages sent',
+      why:'Direct outreach converts far better than cold applications alone — see Outreach tab for templates.',
+      steps:['Message data engineers and recruiters at target companies.','Reference your real freelance project and portfolio.','Ask for a 15-min chat, not a job.'],
+      tmpl:null, warn:null,
+      resources:[{l:'LinkedIn',u:'https://linkedin.com'}]},
+    { id:'w4t4', text:'Interview prep: 10 SQL problems + practice project explanations', time:'2h', kpi:'10 SQL problems solved, projects explainable in 3 min each',
+      why:'Job responses will come — be ready to convert them.',
+      steps:['Practice SQL window functions, JOINs, duplicate detection on StrataScratch or LeetCode.','Practice explaining both projects out loud: problem → approach → challenge → result, under 3 minutes.','Use AI Coach tab for mock interview practice.'],
+      tmpl:null, warn:null,
+      resources:[{l:'StrataScratch (DE-focused SQL)',u:'https://stratascratch.com'},{l:'LeetCode SQL',u:'https://leetcode.com/problemset/database/'}]},
+    { id:'w4t5', text:'Full month review (use Weekly Review tab)', time:'30min', kpi:'All 7 review questions answered',
+      why:'After 4 weeks, decide where to put more weight in month 2 — based on real data, not guesses.',
+      steps:['Open Weekly Review tab. Answer all 7 questions honestly.','If freelancing clearly working: lean further in for month 2.','If interviews are coming: shift more weight to interview prep.'],
+      tmpl:null, warn:null, resources:[]},
+  ]},
+];
+
+const GERMAN_LESSONS = [
+  {level:'A1',unit:1,title:'Greetings & Introducing Yourself',
+   vocab:[{de:'Hallo',en:'Hello'},{de:'Guten Morgen',en:'Good morning'},{de:'Wie heißt du?',en:'What\'s your name?'},{de:'Ich heiße...',en:'My name is...'},{de:'Woher kommst du?',en:'Where are you from?'},{de:'Ich komme aus...',en:'I come from...'},{de:'Schön, dich kennenzulernen',en:'Nice to meet you'},{de:'Tschüss',en:'Bye'},{de:'Auf Wiedersehen',en:'Goodbye (formal)'},{de:'Bitte / Danke',en:'Please / Thank you'}],
+   grammar:{title:'sein (to be)',exp:'ich bin · du bist · er/sie ist · wir sind · ihr seid · sie sind',eg:'Ich bin Data Engineer. Du bist aus Deutschland.'},
+   ex:{q:'Translate: "My name is Ahmed. I come from Egypt. Nice to meet you."',a:'Ich heiße Ahmed. Ich komme aus Ägypten. Schön, dich kennenzulernen.'}},
+  {level:'A1',unit:2,title:'Numbers & Daily Questions',
+   vocab:[{de:'Wie geht\'s?',en:'How are you?'},{de:'Mir geht\'s gut',en:'I\'m doing well'},{de:'Wie alt bist du?',en:'How old are you?'},{de:'Ich bin ... Jahre alt',en:'I am ... years old'},{de:'Was machst du beruflich?',en:'What\'s your job?'},{de:'Ich bin Data Engineer',en:'I am a Data Engineer'},{de:'Ich arbeite als...',en:'I work as...'},{de:'Ich suche eine Arbeit',en:'I\'m looking for a job'},{de:'eins zwei drei',en:'one two three'},{de:'Vielleicht',en:'Maybe'}],
+   grammar:{title:'W-Questions',exp:'Wer (who) · Was (what) · Wo (where) · Wann (when) · Wie (how) — verb is always second word',eg:'Was machst du? Wo arbeitest du?'},
+   ex:{q:'Translate: "I am 26 years old. I work as a Data Engineer."',a:'Ich bin 26 Jahre alt. Ich arbeite als Data Engineer.'}},
+  {level:'A1',unit:3,title:'Daily Routine & Time',
+   vocab:[{de:'der Morgen',en:'the morning'},{de:'heute',en:'today'},{de:'morgen',en:'tomorrow'},{de:'jeden Tag',en:'every day'},{de:'ich lerne',en:'I learn/study'},{de:'ich arbeite',en:'I work'},{de:'die Arbeit',en:'the work'},{de:'Wie spät ist es?',en:'What time is it?'},{de:'Es ist ... Uhr',en:'It is ... o\'clock'},{de:'jetzt',en:'now'}],
+   grammar:{title:'Present Tense Regular Verbs',exp:'lernen → ich lerne / du lernst / er lernt / wir lernen',eg:'Ich lerne jeden Tag Deutsch. Ich arbeite am Morgen.'},
+   ex:{q:'Translate: "Every day I study German and work in the morning."',a:'Jeden Tag lerne ich Deutsch und ich arbeite am Morgen.'}},
+  {level:'A2',unit:4,title:'Skills & Job Experience',
+   vocab:[{de:'die Erfahrung',en:'experience'},{de:'die Fähigkeit',en:'skill/ability'},{de:'ich kann',en:'I can'},{de:'das Projekt',en:'the project'},{de:'die Datenbank',en:'the database'},{de:'die Programmierung',en:'programming'},{de:'die Firma',en:'the company'},{de:'ich habe gemacht',en:'I have done'},{de:'ich habe gearbeitet',en:'I have worked'},{de:'Ich kenne mich aus mit',en:'I am familiar with'}],
+   grammar:{title:'Perfekt (Past Tense)',exp:'haben + past participle: gearbeitet · gelernt · gemacht',eg:'Ich habe ein Projekt gemacht. Ich habe als Data Engineer gearbeitet.'},
+   ex:{q:'Translate: "I have worked on a project with a database. I can program in Python."',a:'Ich habe an einem Projekt mit einer Datenbank gearbeitet. Ich kann in Python programmieren.'}},
+  {level:'A2',unit:5,title:'Job Interview Basics',
+   vocab:[{de:'das Vorstellungsgespräch',en:'job interview'},{de:'die Stelle',en:'position'},{de:'die Bewerbung',en:'application'},{de:'der Lebenslauf',en:'CV/resume'},{de:'verfügbar',en:'available'},{de:'Ich bin motiviert',en:'I am motivated'},{de:'die Stärke',en:'strength'},{de:'die Schwäche',en:'weakness'},{de:'Ich freue mich darauf',en:'I look forward to it'},{de:'Wann kann ich anfangen?',en:'When can I start?'}],
+   grammar:{title:'Modal Verbs',exp:'können (can) · möchten (would like) · müssen (must) — modal conjugates, main verb goes to END',eg:'Ich möchte gerne in Ihrem Team arbeiten. Ich kann sofort anfangen.'},
+   ex:{q:'Translate: "I would like to work in your team. I can start immediately."',a:'Ich möchte gerne in Ihrem Team arbeiten. Ich kann sofort anfangen.'}},
+  {level:'B1',unit:6,title:'Describing Technical Work',
+   vocab:[{de:'die Pipeline',en:'pipeline'},{de:'automatisieren',en:'to automate'},{de:'die Herausforderung',en:'challenge'},{de:'die Lösung',en:'solution'},{de:'verantwortlich für',en:'responsible for'},{de:'optimieren',en:'to optimize'},{de:'die Datenverarbeitung',en:'data processing'},{de:'zusammenarbeiten',en:'to collaborate'},{de:'die Anforderung',en:'requirement'},{de:'die Schnittstelle',en:'API/interface'}],
+   grammar:{title:'Subordinate Clauses — weil & dass',exp:'weil (because) and dass (that) push the verb to END of clause',eg:'Ich habe Airflow benutzt, weil die Pipeline automatisiert werden musste.'},
+   ex:{q:'Translate: "I automated the pipeline because the team needed a solution."',a:'Ich habe die Pipeline automatisiert, weil das Team eine Lösung gebraucht hat.'}},
+];
+
+const CV_LIST = ['1 page only — no exceptions for junior roles','No photo (most remote/Western employers don\'t expect one)','Every bullet has a number or measurable result','Skills section matches keywords from real job postings','Projects section near top, before unrelated work experience','File named: FirstName_LastName_DataEngineer.pdf','Single column layout — no tables or text boxes (ATS)','Zero spelling errors','Contact info includes LinkedIn and GitHub links','2-line tailored summary per application'];
+const LI_LIST = ['Headline: role + 3 core tools, not just job title','Professional photo — plain background, shoulders up','Open to Work turned ON with target titles listed','About section: 3 short paragraphs, conversational tone','Featured section has portfolio links','Experience includes bootcamp + freelance with quantified bullets','Skills: 10+ relevant skills, top 3 pinned','Custom LinkedIn URL (linkedin.com/in/yourname)','At least 1 recommendation requested','Consistent activity: 1 post/comment per week'];
+const PORT_LIST = ['Minimum 2 projects, each with a clear README','At least 1 project uses Airflow or orchestration','Architecture diagram in at least 1 project','No hardcoded secrets or API keys anywhere','GitHub profile README with links to top projects','Sample output shown in README (screenshot or table)','At least 1 project uses a realistic messy dataset','Consistent commit history — not one giant final commit'];
+const TOOLKIT_LISTS = { cv: CV_LIST, li: LI_LIST, port: PORT_LIST };
+const TOOLKIT_COLORS = { cv:'#00C9A7', li:'#4F8EF7', port:'#A78BFA' };
+const TOOLKIT_LABELS = { cv:'CV', li:'LinkedIn', port:'Portfolio' };
+
+const REVIEW_QS = [
+  {q:'How many proposals did I send this week?',hint:'Target: 10-15/week. Below that? Proposals need to be your top priority next week.'},
+  {q:'How many client responses did I get?',hint:'0 responses after 20+ proposals = your opening line needs a rewrite. That\'s the fix.'},
+  {q:'Did I earn any money this week?',hint:'Even $20 counts. First income proves the system works.'},
+  {q:'Did I keep up with German practice (4+ days)?',hint:'Consistency beats intensity — 20 min/day beats 2 hours on Sunday.'},
+  {q:'What is my single biggest blocker right now?',hint:'Be specific. "Not getting responses" is vague. "My profile has no portfolio link" is actionable.'},
+  {q:'How many job applications did I send?',hint:'Target: 5-8/week in background. Don\'t let this eat your proposal time.'},
+  {q:'What is my ONE priority for next week?',hint:'Only one. Focus compounds — scattered effort doesn\'t.'},
+];
+
+const METRIC_FIELDS = [
+  {id:'proposals',label:'Proposals Sent',target:65,color:'#00C9A7'},
+  {id:'earnings',label:'Freelance Earnings ($)',target:200,color:'#F0A500'},
+  {id:'clients',label:'Clients / Reviews',target:2,color:'#3FB950'},
+  {id:'applications',label:'Job Applications',target:16,color:'#4F8EF7'},
+];
+
+// ═══ TAB NAVIGATION ══════════════════════════════════════════════
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ═══ BUILD DASHBOARD ═════════════════════════════════════════════
+function buildDashboard() {
+  // Week progress grid
+  const grid = document.getElementById('week-progress-grid');
+  grid.innerHTML = '';
+  const wInfos = [
+    {id:'w1',label:'Week 1',theme:'Get Sellable & Launch',color:'#00C9A7',total:6},
+    {id:'w2',label:'Week 2',theme:'Volume & First Client',color:'#4F8EF7',total:6},
+    {id:'w3',label:'Week 3',theme:'Repeat + Job Materials',color:'#F0A500',total:4},
+    {id:'w4',label:'Week 4',theme:'Scale Both Tracks',color:'#A78BFA',total:5},
+  ];
+  wInfos.forEach((w,i) => {
+    const wData = WEEKS_DATA.find(wd=>wd.id===w.id);
+    const done = wData.tasks.filter(t=>state.tasks[t.id]).length;
+    const pct = Math.round(done/w.total*100);
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-weight:700;font-size:13px">${w.label}</div><div style="font-size:12px;font-weight:700;color:${w.color}">${pct}%</div></div><div style="font-size:11px;color:#8B949E;margin-bottom:8px">${w.theme}</div><div class="bar-wrap" style="height:5px"><div class="bar-fill" style="width:${pct}%;background:${w.color};height:5px"></div></div><div style="font-size:10px;color:#484F58;margin-top:5px">${done}/${w.total} tasks</div>`;
+    div.onclick = () => showTab(w.id, document.querySelectorAll('.tab-btn')[i+1]);
+    grid.appendChild(div);
+  });
+  // Metrics grid
+  const mg = document.getElementById('metrics-grid');
+  mg.innerHTML = '';
+  METRIC_FIELDS.forEach(m => {
+    const v = parseInt(state.metrics[m.id]||0);
+    const p = Math.min(100,Math.round(v/m.target*100));
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<div style="font-size:11px;color:#8B949E;margin-bottom:6px">${m.label}</div><input type="number" min="0" class="metric-input" value="${state.metrics[m.id]||''}" placeholder="0" data-mid="${m.id}" oninput="updateMetric(this)"/><div class="bar-wrap" style="height:5px"><div class="bar-fill" id="mbar-${m.id}" style="width:${p}%;background:${m.color};height:5px"></div></div><div style="font-size:10px;color:#484F58;margin-top:5px">Target: ${m.target}</div>`;
+    mg.appendChild(div);
+  });
+}
+
+function updateMetric(input) {
+  const id = input.dataset.mid;
+  state.metrics[id] = input.value;
+  const m = METRIC_FIELDS.find(f=>f.id===id);
+  const v = parseInt(input.value||0);
+  const p = Math.min(100,Math.round(v/m.target*100));
+  document.getElementById('mbar-'+id).style.width = p+'%';
+  updateOverallPct();
+}
+
+// ═══ BUILD TASKS ══════════════════════════════════════════════════
+function buildWeekTasks() {
+  WEEKS_DATA.forEach(w => {
+    const container = document.getElementById('tasks-'+w.id);
+    if(!container) return;
+    container.innerHTML = '';
+    w.tasks.forEach(t => {
+      const done = !!state.tasks[t.id];
+      const div = document.createElement('div');
+      div.className = 'task-card' + (done?' done':'');
+      div.id = 'tc-'+t.id;
+      div.style.borderColor = done ? w.color+'40' : '#30363D';
+
+      let stepsHtml = t.steps.map((s,i) => `<div class="guide-step"><div class="step-num" style="background:${w.color}22;color:${w.color}">${i+1}</div><div class="step-body">${s}</div></div>`).join('');
+      let tmplHtml = t.tmpl ? `<div class="guide-label" style="color:${w.color};margin-top:12px">Template</div><pre class="template">${t.tmpl}</pre>` : '';
+      let resHtml = t.resources && t.resources.length ? `<div class="guide-label" style="color:${w.color};margin:10px 0 6px">Resources</div>${t.resources.map(r=>`<a href="${r.u}" target="_blank" class="resource-link">↗ ${r.l}</a>`).join('')}` : '';
+      let warnHtml = t.warn ? `<div class="warn-box"><span style="color:#FF5C5C;font-weight:700">⚠ </span><span style="font-size:12px;color:#8B949E">${t.warn}</span></div>` : '';
+
+      div.innerHTML = `
+        <div class="task-header" onclick="toggleGuide('${t.id}')">
+          <div class="task-check" id="chk-${t.id}" onclick="event.stopPropagation();toggleTask('${t.id}','${w.id}','${w.color}')" style="border-color:${done?w.color:'#30363D'};background:${done?w.color:'transparent'}">${done?'✓':''}</div>
+          <div style="flex:1;min-width:0">
+            <div class="task-text" style="color:${done?'#8B949E':'#E6EDF3'};text-decoration:${done?'line-through':'none'}">${t.text}</div>
+            <div class="task-meta"><span class="task-time" style="color:${w.color}">⏱ ${t.time}</span><span class="task-kpi">KPI: ${t.kpi}</span></div>
+          </div>
+          <span class="task-arrow" id="arr-${t.id}">▼</span>
+        </div>
+        <div class="task-guide" id="guide-${t.id}">
+          <div class="guide-label" style="color:${w.color}">Why this matters</div>
+          <div class="guide-why">${t.why}</div>
+          <div class="guide-label" style="color:${w.color}">Step-by-step</div>
+          <div class="guide-steps">${stepsHtml}</div>
+          ${tmplHtml}${resHtml}${warnHtml}
+        </div>`;
+      container.appendChild(div);
+    });
+  });
+}
+
+function toggleGuide(id) {
+  const g = document.getElementById('guide-'+id);
+  const a = document.getElementById('arr-'+id);
+  const open = g.classList.toggle('open');
+  a.textContent = open ? '▲' : '▼';
+}
+
+function toggleTask(id, weekId, color) {
+  state.tasks[id] = !state.tasks[id];
+  const done = state.tasks[id];
+  const card = document.getElementById('tc-'+id);
+  const chk = document.getElementById('chk-'+id);
+  const wData = WEEKS_DATA.find(w=>w.id===weekId);
+
+  if(done) { card.classList.add('done'); card.style.borderColor=color+'40'; }
+  else { card.classList.remove('done'); card.style.borderColor='#30363D'; }
+  chk.style.borderColor = done?color:'#30363D';
+  chk.style.background = done?color:'transparent';
+  chk.textContent = done?'✓':'';
+
+  // update text decoration
+  const txt = card.querySelector('.task-text');
+  txt.style.color = done?'#8B949E':'#E6EDF3';
+  txt.style.textDecoration = done?'line-through':'none';
+
+  updateWeekProgress(weekId, wData, color);
+  updateOverallPct();
+  buildDashboard();
+}
+
+function updateWeekProgress(weekId, wData, color) {
+  const done = wData.tasks.filter(t=>state.tasks[t.id]).length;
+  const total = wData.tasks.length;
+  const pct = Math.round(done/total*100);
+  const el = document.getElementById(weekId+'-pct');
+  const bar = document.getElementById(weekId+'-bar');
+  const sub = document.getElementById(weekId+'-sub');
+  if(el) el.textContent = pct+'%';
+  if(bar) bar.style.width = pct+'%';
+  if(sub) sub.textContent = done+'/'+total+' tasks';
+}
+
+function updateOverallPct() {
+  const total = WEEKS_DATA.reduce((a,w)=>a+w.tasks.length,0);
+  const done = Object.values(state.tasks).filter(Boolean).length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('overall-pct').textContent = pct+'%';
+}
+
+// ═══ TOOLKIT ══════════════════════════════════════════════════════
+function showToolkit(sec) {
+  state.activeToolkit = sec;
+  ['cv','li','port'].forEach(s => {
+    const btn = document.getElementById('st-'+s);
+    const c = TOOLKIT_COLORS[s];
+    if(s===sec) { btn.style.borderColor=c; btn.style.color=c; btn.style.background=c+'18'; }
+    else { btn.style.borderColor='#30363D'; btn.style.color='#8B949E'; btn.style.background='#161B22'; }
+  });
+  document.getElementById('toolkit-label').textContent = TOOLKIT_LABELS[sec]+' Checklist';
+  document.getElementById('toolkit-bar').style.background = TOOLKIT_COLORS[sec];
+  renderToolkitItems();
+}
+
+function renderToolkitItems() {
+  const sec = state.activeToolkit;
+  const items = TOOLKIT_LISTS[sec];
+  const checks = state.checks[sec];
+  const color = TOOLKIT_COLORS[sec];
+  const done = Object.values(checks).filter(Boolean).length;
+  document.getElementById('toolkit-count').textContent = done+'/'+items.length;
+  document.getElementById('toolkit-count').style.color = color;
+  document.getElementById('toolkit-bar').style.width = Math.round(done/items.length*100)+'%';
+  const container = document.getElementById('toolkit-items');
+  container.innerHTML = '';
+  items.forEach((item,i) => {
+    const checked = !!checks[i];
+    const div = document.createElement('div');
+    div.className = 'check-item';
+    div.style.background = checked?color+'10':'#161B22';
+    div.style.borderColor = checked?color+'40':'#30363D';
+    div.innerHTML = `<div class="check-box" style="border-color:${checked?color:'#30363D'};background:${checked?color:'transparent'};color:${checked?'#000':'transparent'}">${checked?'✓':''}</div><div class="check-text" style="color:${checked?'#8B949E':'#E6EDF3'};text-decoration:${checked?'line-through':'none'}">${item}</div>`;
+    div.onclick = () => {
+      state.checks[sec][i] = !state.checks[sec][i];
+      renderToolkitItems();
+    };
+    container.appendChild(div);
+  });
+}
+
+// ═══ OUTREACH ═════════════════════════════════════════════════════
+function showOutreach(view) {
+  document.getElementById('outreach-guide').style.display = view==='guide'?'block':'none';
+  document.getElementById('outreach-tmpl').style.display = view==='tmpl'?'block':'none';
+  document.getElementById('ot-guide').style.borderColor = view==='guide'?'#00C9A7':'#30363D';
+  document.getElementById('ot-guide').style.color = view==='guide'?'#00C9A7':'#8B949E';
+  document.getElementById('ot-guide').style.background = view==='guide'?'rgba(0,201,167,.1)':'#161B22';
+  document.getElementById('ot-tmpl').style.borderColor = view==='tmpl'?'#00C9A7':'#30363D';
+  document.getElementById('ot-tmpl').style.color = view==='tmpl'?'#00C9A7':'#8B949E';
+  document.getElementById('ot-tmpl').style.background = view==='tmpl'?'rgba(0,201,167,.1)':'#161B22';
+}
+
+// ═══ DEUTSCH ══════════════════════════════════════════════════════
+function showDeutsch(mode) {
+  state.activeDeutsch = mode;
+  document.getElementById('deutsch-lessons').style.display = mode==='lessons'?'block':'none';
+  document.getElementById('deutsch-practice').style.display = mode==='practice'?'block':'none';
+  document.getElementById('deutsch-phrases').style.display = mode==='phrases'?'block':'none';
+  ['lessons','practice','phrases'].forEach(m => {
+    const btn = document.getElementById('dt-'+m);
+    if(m===mode){ btn.style.borderColor='#FFD24A'; btn.style.color='#FFD24A'; btn.style.background='rgba(255,210,74,.1)'; }
+    else { btn.style.borderColor='#30363D'; btn.style.color='#8B949E'; btn.style.background='#161B22'; }
+  });
+}
+
+function buildLessonPills() {
+  const container = document.getElementById('lesson-pills');
+  container.innerHTML = '';
+  GERMAN_LESSONS.forEach((l,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'lesson-pill';
+    btn.textContent = (state.germanProgress[i]?'✓ ':'')+l.level+'·U'+l.unit;
+    if(i===state.activeLesson){ btn.style.borderColor='#FFD24A'; btn.style.color='#FFD24A'; btn.style.background='rgba(255,210,74,.1)'; }
+    btn.onclick = () => { state.activeLesson=i; renderLesson(); };
+    container.appendChild(btn);
+  });
+}
+
+function renderLesson() {
+  buildLessonPills();
+  const l = GERMAN_LESSONS[state.activeLesson];
+  const done = state.germanProgress[state.activeLesson];
+  const container = document.getElementById('lesson-content');
+  const vocabHtml = l.vocab.map(v=>`<div class="vocab-item"><div class="vocab-de">${v.de}</div><div class="vocab-en">${v.en}</div></div>`).join('');
+  container.innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <span class="tag" style="background:rgba(255,210,74,.2);color:#FFD24A">${l.level}</span>
+        <span style="font-size:15px;font-weight:800">${l.title}</span>
+      </div>
+      <div class="slabel">Vocabulary</div>
+      <div class="vocab-grid">${vocabHtml}</div>
+      <div class="slabel">Grammar — ${l.grammar.title}</div>
+      <div class="card-hi" style="margin-bottom:16px">
+        <div style="font-size:12px;color:#8B949E;line-height:1.6;margin-bottom:6px">${l.grammar.exp}</div>
+        <div style="font-size:12px;color:#FFD24A;font-style:italic">${l.grammar.eg}</div>
+      </div>
+      <div class="slabel">Exercise</div>
+      <div class="card-hi">
+        <div style="font-size:12.5px;margin-bottom:10px">${l.ex.q}</div>
+        <div id="answer-area">
+          <button class="btn-outline" style="color:#A78BFA;border-color:#A78BFA" onclick="showAnswer()">Show Answer</button>
+        </div>
+      </div>
+      <button onclick="markLessonDone()" style="margin-top:16px;width:100%;background:${done?'#3FB950':'#FFD24A'};border:none;border-radius:8px;padding:11px;color:#000;font-weight:700;font-size:12.5px;cursor:pointer">
+        ${done?'✓ Lesson Complete':'Mark Lesson Complete'}
+      </button>
+    </div>`;
+  updateGermanProgressLabel();
+}
+
+function showAnswer() {
+  const l = GERMAN_LESSONS[state.activeLesson];
+  document.getElementById('answer-area').innerHTML = `<div style="font-size:12.5px;color:#3FB950;font-weight:600">✓ ${l.ex.a}</div>`;
+}
+
+function markLessonDone() {
+  state.germanProgress[state.activeLesson] = !state.germanProgress[state.activeLesson];
+  renderLesson();
+  updateGermanProgressLabel();
+}
+
+function updateGermanProgressLabel() {
+  const done = Object.values(state.germanProgress).filter(Boolean).length;
+  document.getElementById('german-progress-label').textContent = done+'/'+GERMAN_LESSONS.length+' lessons completed';
+}
+
+// ═══ GERMAN CHAT ══════════════════════════════════════════════════
+const GERMAN_SYS = `You are a friendly German conversation practice partner for an A1-A2 learner moving toward B1. Rules: 1) Write primarily in simple German but always add English translation in parentheses after each German sentence. 2) Gently correct mistakes: show corrected German, briefly explain in English, then continue naturally. 3) Keep messages short (3-5 sentences max). 4) Occasionally ask a question to keep conversation going. 5) Stay warm and encouraging.`;
+let germanHistory = [];
+
+function setGermanInput(text) { document.getElementById('german-input').value = text; }
+
+async function sendGerman() {
+  const input = document.getElementById('german-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  appendMsg('german-msgs', text, true, '#FFD24A');
+  germanHistory.push({role:'user',content:text});
+  const typing = addTyping('german-msgs', '#FFD24A');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,system:GERMAN_SYS,messages:germanHistory})});
+    const d = await res.json();
+    const reply = d.content?.map(b=>b.text||'').join('')||'Entschuldigung, etwas ist schiefgelaufen.';
+    typing.remove();
+    appendMsg('german-msgs', reply, false, '#FFD24A');
+    germanHistory.push({role:'assistant',content:reply});
+  } catch(e) {
+    typing.remove();
+    appendMsg('german-msgs', 'Connection error. Try again.', false, '#FFD24A');
+  }
+}
+
+// ═══ AI COACH ═════════════════════════════════════════════════════
+const COACH_SYS = `You are a brutally honest career mentor. Profile: finished data engineering bootcamp, MENA region, intermediate English, 1-3 month runway. TOP PRIORITY = freelance income via Upwork/Fiverr (data cleaning, Python automation, pipelines). SECONDARY = job applications (Junior Data Engineer). Also learning German A1→B1 daily. Rules: 1) Be brutally realistic, no hype. 2) Default to freelancing/income questions as priority. 3) Give exact actions, exact resources, concrete examples. 4) If asked to review a proposal or CV bullet, REWRITE it concretely. 5) Can role-play as client (proposal practice) or interviewer (mock interview). 6) Keep responses concise. 7) End with ONE clear next action. 8) No motivational filler.`;
+let coachHistory = [];
+
+function setCoachInput(text) { document.getElementById('coach-input').value = text; }
+
+async function sendCoach() {
+  const input = document.getElementById('coach-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  appendMsg('coach-msgs', text, true, '#00C9A7');
+  coachHistory.push({role:'user',content:text});
+  const typing = addTyping('coach-msgs', '#00C9A7');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,system:COACH_SYS,messages:coachHistory})});
+    const d = await res.json();
+    const reply = d.content?.map(b=>b.text||'').join('')||'Something went wrong. Try again.';
+    typing.remove();
+    appendMsg('coach-msgs', reply, false, '#00C9A7');
+    coachHistory.push({role:'assistant',content:reply});
+  } catch(e) {
+    typing.remove();
+    appendMsg('coach-msgs', 'Connection error. Check your internet and try again.', false, '#00C9A7');
+  }
+}
+
+// ═══ CHAT HELPERS ════════════════════════════════════════════════
+function appendMsg(containerId, text, isUser, color) {
+  const c = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (isUser?'user':'bot');
+  if(isUser){ div.style.background=color; div.style.color='#000'; }
+  div.textContent = text;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function addTyping(containerId, color) {
+  const c = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.innerHTML = `<div class="dot" style="background:${color};animation-delay:0s"></div><div class="dot" style="background:${color};animation-delay:.2s"></div><div class="dot" style="background:${color};animation-delay:.4s"></div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+  return div;
+}
+
+// ═══ WEEKLY REVIEW ════════════════════════════════════════════════
+function buildReview() {
+  const container = document.getElementById('review-questions');
+  container.innerHTML = '';
+  REVIEW_QS.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.marginBottom = '10px';
+    div.id = 'rq-'+i;
+    div.innerHTML = `<div style="font-size:13px;font-weight:600;margin-bottom:4px"><span style="color:#00C9A7;font-weight:800;margin-right:6px">${i+1}.</span>${item.q}</div><div style="font-size:11px;color:#484F58;font-style:italic;margin-bottom:8px">💡 ${item.hint}</div><textarea class="review-area" rows="2" placeholder="Be honest. Write anything." oninput="updateReview(${i},this.value)">${state.reviewAnswers[i]||''}</textarea>`;
+    container.appendChild(div);
+  });
+}
+
+function updateReview(i, val) {
+  state.reviewAnswers[i] = val;
+  const card = document.getElementById('rq-'+i);
+  card.style.borderColor = val.trim() ? 'rgba(0,201,167,.4)' : '#30363D';
+  const allDone = REVIEW_QS.every((_,j)=>(state.reviewAnswers[j]||'').trim());
+  document.getElementById('review-done').style.display = allDone?'block':'none';
+}
+
+// ═══ INIT ════════════════════════════════════════════════════════
+buildDashboard();
+buildWeekTasks();
+renderToolkitItems();
+buildLessonPills();
+renderLesson();
+buildReview();
+</script>
+</body>
+</html>
